@@ -1,0 +1,6 @@
+To do:
+	Check correct lenght of roomba
+	Implement Move
+	Implement Sense (Read encoders)
+	Add minimum radius (as to not turn inplace)
+	
