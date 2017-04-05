@@ -22,35 +22,35 @@
 # modified by Enrique April 2017
 
 import serial
-import math
+from math import *
 import time
 
 #some module-level definitions for the robot commands
 # As per "iRobot_Roomba_500_Open_Interface_Spec.pdf" page 29
-START = chr(128)	 # already converted to bytes...
-BAUD = chr(129)	  # + 1 byte
-CONTROL = chr(130)  # deprecated for Create
-SAFE = chr(131)
-FULL = chr(132)
-POWER = chr(133)
-SPOT = chr(134)	  # Same for the Roomba and Create
-CLEAN = chr(135)	 # Clean button - Roomba
-MAX = chr(136)		# Roomba
-DRIVE = chr(137)	 # + 4 bytes
-MOTORS = chr(138)	# + 1 byte
-LEDS = chr(139)	  # + 3 bytes
-SONG = chr(140)	  # + 2N+2 bytes, where N is the number of notes
-PLAY = chr(141)	  # + 1 byte
-QUERY = chr(142)  # + 1 byte
+START = 128	 # already converted to bytes...
+BAUD = 129	  # + 1 byte
+CONTROL = 130  # deprecated for Create
+SAFE = 131
+FULL = 132
+POWER = 133
+SPOT = 134	  # Same for the Roomba and Create
+CLEAN = 135	 # Clean button - Roomba
+MAX = 136		# Roomba
+DRIVE = 137	 # + 4 bytes
+MOTORS = 138	# + 1 byte
+LEDS = 139	  # + 3 bytes
+SONG = 140	  # + 2N+2 bytes, where N is the number of notes
+PLAY = 141	  # + 1 byte
+QUERY = 142  # + 1 byte
 #SENSORS = chr(142)  # + 1 byte
-FORCESEEKINGDOCK = chr(143)  # same on Roomba and Create
+FORCESEEKINGDOCK = 143  # same on Roomba and Create
 # the above command is called "Cover and Dock" on the Create
-PWMMOTORS = chr(144)	# [MainBrush, SideBrush, Vaccum] in PWM values
-DRIVEDIRECT = chr(145)		 # Create only
-DRIVEPWM = chr(146)	#
-STREAM = chr(148)		 # Create only
-QUERYLIST = chr(149)		 # Create only
-DOSTREAM = chr(150)		 # Create only
+PWMMOTORS = 144	# [MainBrush, SideBrush, Vaccum] in PWM values
+DRIVEDIRECT = 145		 # Create only
+DRIVEPWM = 146	#
+STREAM = 148		 # Create only
+QUERYLIST = 149		 # Create only
+DOSTREAM = 150		 # Create only
 #PAUSERESUME = chr(150)		 # Create only
 
 # the four SCI modes
@@ -151,6 +151,7 @@ class robot:
 		self.measurement_noise = 0.0
 		self.num_collisions	 = 0
 		self.num_steps			= 0
+		self.WHEEL_SPAN = 233.0
 
 		# Setting OI mode
 		self.sciMode = OFF_MODE
@@ -160,20 +161,21 @@ class robot:
 		  #self.rightEncoder = -1
 
 	def OIsetMode(self, mode):
-		time.sleep(0.03)
+		time.sleep(.3)
 		#print("Writing to serial: ", hex(int(mode_list[mode][0])))
 		self._write(mode_list[mode][0])
-		time.sleep(0.03)
+		time.sleep(.3)
 		#print("Internal state to: ", mode_list[mode][1])
 		self.sciMode = mode_list[mode][1]
 		print(modeStr(mode_list[mode][1]))
-		return
+		#return
 	
 	### SERIAL functions
 	def _write(self, byte):
 		if self._debug==True:
-			print (ord(byte))
-		self.ser.write(byte.encode())
+			print (hex(byte))
+		#self.ser.write(byte.encode())
+		self.ser.write(bytes([byte]))
 	
 	def _writeBytes(self, list):
 		for i in list:
@@ -215,7 +217,7 @@ class robot:
 
 	def disconnect(self):
 		print("Shutting down robot...")
-		self.OIsetMode(0)
+		self.OIsetMode(1)
 		print("Closing port...")
 		self.ser.close()
 
@@ -254,7 +256,13 @@ class robot:
 			print("Driving with Vel and radius Values: ")
 
 		out=[DRIVE, chr(velHighVal), chr(velLowVal), chr(radiusHighVal), chr(radiusLowVal)]
-		self._writeBytes(out)
+		#self._writeBytes(out)
+		self._write( DRIVE )
+		self._write(velHighVal)
+		self._write(velLowVal)
+		self._write(radiusHighVal)
+		self._write(radiusLowVal)
+
 
 	def setLeds(self, color, intensity, play, advance):
 		raise NotImplemented
