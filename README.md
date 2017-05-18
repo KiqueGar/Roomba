@@ -12,4 +12,7 @@ Once installed, activate it
 `activate roomba`
 
 *my_rooba.py* contains the robot class for interacting with the robot
+
 *test_scrypt.py* contains an example of use.
+
+XCTU config files are located in *Xbee_config* and loaded via XCTU
